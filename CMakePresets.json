@@ -43,7 +43,12 @@
       "configuration": "Debug"
     },
     {
-      "name": "release-static",
+      "name": "release",
+      "configurePreset": "default",
+      "configuration": "Release"
+    },
+    {
+      "name": "static-release",
       "configurePreset": "static",
       "configuration": "Release"
     },
