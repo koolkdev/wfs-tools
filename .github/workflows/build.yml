@@ -32,13 +32,16 @@ jobs:
       with:
         vcpkgJsonGlob: 'vcpkg.json'
 
+    - name: Install requirements
+      run: sudo apt install gcc-11 g++-11
+      if: matrix.platform == 'linux-latest'
+
     - name: Set compiler
       run: |
-           sudo apt install gcc-11 g++-11
-           echo "CC=${{ matrix.platform.cc }}" >> $GITHUB_ENV
-           echo "CXX=${{ matrix.platform.cxx }}" >> $GITHUB_ENV
+           echo "CC=${{ matrix.cc }}" >> $GITHUB_ENV
+           echo "CXX=${{ matrix.cxx }}" >> $GITHUB_ENV
       shell: bash
-      if: matrix.platform.cc != ''
+      if: matrix.cc != ''
 
     - name: Run cmake
       uses: lukka/run-cmake@v10
