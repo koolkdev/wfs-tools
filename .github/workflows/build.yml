@@ -7,6 +7,17 @@ jobs:
     strategy:
       matrix:
         platform: [ubuntu-latest, windows-latest] # macos-latest
+        include:
+          - os: ubuntu-latest
+            configure_preset: 'static'
+            build_preset: 'static-release'
+            cc: 'gcc-11'
+            cxx: 'g++-11'
+            release_name: 'linux-x86-64'
+          - os: windows-latest
+            configure_preset: 'windows-static'
+            build_preset: 'windows-static-release'
+            release_name: 'windows-x64'
     runs-on: ${{matrix.platform}}
 
     steps:
@@ -21,51 +32,30 @@ jobs:
       with:
         vcpkgJsonGlob: 'vcpkg.json'
 
-    - name: Update gcc
+    - name: Set compiler
       run: |
-           sudo apt update
            sudo apt install gcc-11 g++-11
-           echo "CC=gcc-11" >> $GITHUB_ENV
-           echo "CXX=g++-11" >> $GITHUB_ENV
+           echo "CC=${{ matrix.platform.cc }}" >> $GITHUB_ENV
+           echo "CXX=${{ matrix.platform.cxx }}" >> $GITHUB_ENV
       shell: bash
-      if: matrix.platform == 'ubuntu-latest'
-
-    - name: Set clang
-      run: |
-           echo "CC=/usr/local/opt/llvm/bin/clang" >> $GITHUB_ENV
-           echo "CXX=/usr/local/opt/llvm/bin/clang++" >> $GITHUB_ENV
-      shell: bash
-      if: matrix.platform == 'macos-latest'
-
-    - name: Run cmake
-      run: |
-        vcpkg\vcpkg.exe env
-        cmd /c set
-      if: matrix.platform == 'windows-latest'
+      if: matrix.platform.cc != ''
 
     - name: Run cmake
       uses: lukka/run-cmake@v10
       with:
-        configurePreset: 'windows-static'
-        buildPreset: 'windows-static-release'
-      if: matrix.platform == 'windows-latest'
-
-    - name: Run cmake
-      uses: lukka/run-cmake@v10
-      with:
-        configurePreset: 'static'
-        buildPreset: 'release-static'
+        configurePreset:  ${{ matrix.configure_preset }}
+        buildPreset: ${{ matrix.build_preset }}
       if: matrix.platform == 'ubuntu-latest'
 
-    - uses: actions/upload-artifact@v2
+    - name: Upload wfs-extract
+      uses: actions/upload-artifact@v2
       with:
-        name: ${{ matrix.platform }}-release
-        path: build/windows-static/wfs-extract/Release
-      if: matrix.platform == 'windows-latest'
+        name: wfs-extract-${{ matrix.release_name }}
+        path: build/${{ matrix.configure_preset }}/wfs-extract/Release
 
-    - uses: actions/upload-artifact@v2
+    - name: Upload wfs-file-injector
+      uses: actions/upload-artifact@v2
       with:
-        name: ${{ matrix.platform }}-release
-        path: build/static/wfs-extract/Release
-      if: matrix.platform == 'ubuntu-latest'
+        name: wfs-file-injector-${{ matrix.release_name }}
+        path: build/${{ matrix.configure_preset }}/wfs-file-injector/Release
 
