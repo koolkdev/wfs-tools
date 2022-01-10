@@ -38,7 +38,9 @@ jobs:
       if: matrix.platform == 'macos-latest'
 
     - name: Run cmake
-      run: cmd /c set
+      run: |
+        vcpkg\vcpkg.exe env
+        cmd /c set
       if: matrix.platform == 'windows-latest'
 
     - name: Run cmake

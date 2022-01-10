@@ -18,23 +18,21 @@
       }
     },
     {
-      "name": "release-static",
+      "name": "static",
       "inherits": [
         "default"
       ],
-      "generator": "Ninja",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release",
         "BUILD_STATIC": "ON"
       }
     },
     {
-      "name": "windows-release-static",
+      "name": "windows-static",
       "inherits": [
-        "release-static"
+        "static"
       ],
       "cacheVariables": {
-        "VCPKG_TARGET_TRIPLET": "$env{VSCMD_ARG_TGT_ARCH}-windows-static"
+        "VCPKG_TARGET_TRIPLET": "$env{Platform}-windows-static"
       }
     }
   ],
@@ -45,8 +43,13 @@
       "configuration": "Debug"
     },
     {
-      "name": "release",
-      "configurePreset": "default",
+      "name": "release-static",
+      "configurePreset": "static",
+      "configuration": "Release"
+    },
+    {
+      "name": "windows-static-release",
+      "configurePreset": "windows-static",
       "configuration": "Release"
     }
   ]
