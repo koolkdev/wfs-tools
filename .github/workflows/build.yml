@@ -44,6 +44,10 @@ jobs:
         buildPreset: 'release'
 
     - name: Run cmake
+      run: set
+      if: matrix.platform == 'windows-latest'
+
+    - name: Run cmake
       uses: lukka/run-cmake@v10
       with:
         configurePreset: 'windows-release-static'
