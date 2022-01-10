@@ -18,6 +18,8 @@ jobs:
 
     - name: Run vcpkg
       uses: lukka/run-vcpkg@v10
+      with:
+        vcpkgJsonGlob: 'vcpkg.json'
 
     - name: Update gcc
       run: |
@@ -41,4 +43,8 @@ jobs:
         configurePreset: 'default'
         buildPreset: 'release'
 
+    - uses: actions/upload-artifact@v2
+      with:
+        name: ${{ matrix.platform }}-release
+        path: build/default/wfs-extract
 
