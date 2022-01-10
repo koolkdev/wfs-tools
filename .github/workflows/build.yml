@@ -46,21 +46,21 @@ jobs:
     - name: Run cmake
       uses: lukka/run-cmake@v10
       with:
-        configurePreset: 'windows-release-static'
-        buildPreset: 'windows-release-static'
+        configurePreset: 'windows-static'
+        buildPreset: 'windows-static-release'
       if: matrix.platform == 'windows-latest'
 
     - name: Run cmake
       uses: lukka/run-cmake@v10
       with:
-        configurePreset: 'release-static'
+        configurePreset: 'static'
         buildPreset: 'release-static'
       if: matrix.platform == 'ubuntu-latest'
 
     - uses: actions/upload-artifact@v2
       with:
         name: ${{ matrix.platform }}-release
-        path: build/windows-release-static/wfs-extract
+        path: build/windows-static-release/wfs-extract
       if: matrix.platform == 'windows-latest'
 
     - uses: actions/upload-artifact@v2
