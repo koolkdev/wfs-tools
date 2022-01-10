@@ -60,12 +60,12 @@ jobs:
     - uses: actions/upload-artifact@v2
       with:
         name: ${{ matrix.platform }}-release
-        path: build/windows-static-release/wfs-extract
+        path: build/windows-static/wfs-extract/Release
       if: matrix.platform == 'windows-latest'
 
     - uses: actions/upload-artifact@v2
       with:
         name: ${{ matrix.platform }}-release
-        path: build/release-static/wfs-extract
+        path: build/static/wfs-extract/Release
       if: matrix.platform == 'ubuntu-latest'
 
