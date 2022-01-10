@@ -40,27 +40,26 @@ jobs:
 
     - name: Set compiler
       run: |
-           echo "CC=${{ matrix.cc }}" >> $GITHUB_ENV
-           echo "CXX=${{ matrix.cxx }}" >> $GITHUB_ENV
+           echo "CC=${{matrix.cc}}" >> $GITHUB_ENV
+           echo "CXX=${{matrix.cxx}}" >> $GITHUB_ENV
       shell: bash
       if: matrix.cc != ''
 
     - name: Run cmake
       uses: lukka/run-cmake@v10
       with:
-        configurePreset:  ${{ matrix.configure_preset }}
-        buildPreset: ${{ matrix.build_preset }}
-      if: matrix.platform == 'ubuntu-latest'
+        configurePreset: ${{matrix.configure_preset}}
+        buildPreset: ${{matrix.build_preset}}
 
     - name: Upload wfs-extract
       uses: actions/upload-artifact@v2
       with:
-        name: wfs-extract-${{ matrix.release_name }}
-        path: build/${{ matrix.configure_preset }}/wfs-extract/Release
+        name: wfs-extract-${{matrix.release_name}}
+        path: build/${{matrix.configure_preset}}/wfs-extract/Release
 
     - name: Upload wfs-file-injector
       uses: actions/upload-artifact@v2
       with:
-        name: wfs-file-injector-${{ matrix.release_name }}
-        path: build/${{ matrix.configure_preset }}/wfs-file-injector/Release
+        name: wfs-file-injector-${{matrix.release_name}}
+        path: build/${{matrix.configure_preset}}/wfs-file-injector/Release
 
