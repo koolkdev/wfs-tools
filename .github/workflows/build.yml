@@ -14,16 +14,25 @@ jobs:
             cc: 'gcc-11'
             cxx: 'g++-11'
             release_name: 'linux-x86-64'
+
           - os: windows-latest
             configure_preset: 'windows-static'
             build_preset: 'windows-static-release'
             release_name: 'windows-x64'
+  
     runs-on: ${{matrix.platform}}
 
     steps:
     - uses: actions/checkout@v2
       with:
         submodules: 'true'
+
+    - run: |
+       echo ${{matrix.configure_preset}}
+       echo ${{matrix.build_preset}}
+       echo ${{matrix.cc}}
+       echo ${{matrix.cxx}}
+       echo ${{matrix.release_name}}
 
     - uses: lukka/get-cmake@latest
 
