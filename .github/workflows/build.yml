@@ -43,8 +43,27 @@ jobs:
         configurePreset: 'default'
         buildPreset: 'release'
 
+    - name: Run cmake
+      uses: lukka/run-cmake@v10
+      with:
+        configurePreset: 'windows-release-static'
+      if: matrix.platform == 'windows-latest'
+
+    - name: Run cmake
+      uses: lukka/run-cmake@v10
+      with:
+        configurePreset: 'release-static'
+      if: matrix.platform == 'ubuntu-latest'
+
     - uses: actions/upload-artifact@v2
       with:
         name: ${{ matrix.platform }}-release
-        path: build/default/wfs-extract
+        path: build/windows-release-static/wfs-extract
+      if: matrix.platform == 'windows-latest'
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: ${{ matrix.platform }}-release
+        path: build/release-static/wfs-extract
+      if: matrix.platform == 'ubuntu-latest'
 

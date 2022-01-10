@@ -18,15 +18,23 @@
       }
     },
     {
-      "name": "windows-static",
+      "name": "release-static",
       "inherits": [
         "default"
       ],
       "generator": "Ninja",
       "cacheVariables": {
-        "VCPKG_TARGET_TRIPLET": "$env{VSCMD_ARG_TGT_ARCH}-windows-static",
         "CMAKE_BUILD_TYPE": "Release",
-        "BUILD_STATIC_MSVC": "ON"
+        "BUILD_STATIC": "ON"
+      }
+    },
+    {
+      "name": "windows-release-static",
+      "inherits": [
+        "release-static"
+      ],
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": "$env{VSCMD_ARG_TGT_ARCH}-windows-static"
       }
     }
   ],
