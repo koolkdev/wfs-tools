@@ -65,6 +65,12 @@ jobs:
       with:
         name: wfs-file-injector-${{matrix.release_name}}
         path: build/${{matrix.configure_preset}}/wfs-file-injector/Release
+    - name: Upload wfs-fuse
+      uses: actions/upload-artifact@v2
+      with:
+        name: wfs-fuse-${{matrix.release_name}}
+        path: build/${{matrix.configure_preset}}/wfs-extract/Release
+      if: matrix.platform != 'windows-latest'
 
     - name: Prepare Release Windows
       run: powershell Compress-Archive -Path build\${{matrix.configure_preset}}\wfs-file-injector\Release\wfs-file-injector.exe, build\${{matrix.configure_preset}}\wfs-extract\Release\wfs-extract.exe -DestinationPath wfs-tools-${{github.ref_name}}-${{matrix.release_name}}.zip
