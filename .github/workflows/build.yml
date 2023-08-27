@@ -25,8 +25,8 @@ jobs:
             release_name: 'windows-x64'
 
           - platform: macos-latest
-            configure_preset: 'static'
-            build_preset: 'static-release'
+            configure_preset: 'default'
+            build_preset: 'release'
             release_name: 'macos-x64'
             cc: '/usr/local/opt/llvm/bin/clang'
             cxx: '/usr/local/opt/llvm/bin/clang++'
@@ -55,6 +55,7 @@ jobs:
            # Temporary fix, see https://github.com/orgs/Homebrew/discussions/3895
            brew install --overwrite python@3.11
            brew install llvm
+           brew install --cask osxfuse
            echo "LDFLAGS=-L/usr/local/opt/llvm/lib" >> $GITHUB_ENV
            echo "CXXFLAGS=-isystem /usr/local/opt/llvm/include" >> $GITHUB_ENV
       shell: bash
