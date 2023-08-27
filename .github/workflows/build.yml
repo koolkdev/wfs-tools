@@ -55,7 +55,7 @@ jobs:
            # Temporary fix, see https://github.com/orgs/Homebrew/discussions/3895
            brew install --overwrite python@3.11
            brew install llvm
-           brew install --cask osxfuse
+           brew install macfuse
            echo "LDFLAGS=-L/usr/local/opt/llvm/lib" >> $GITHUB_ENV
            echo "CXXFLAGS=-isystem /usr/local/opt/llvm/include" >> $GITHUB_ENV
       shell: bash
