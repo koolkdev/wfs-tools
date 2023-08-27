@@ -25,8 +25,8 @@ jobs:
             release_name: 'windows-x64'
 
           - platform: macos-latest
-            configure_preset: 'default'
-            build_preset: 'release'
+            configure_preset: 'static'
+            build_preset: 'static-release'
             release_name: 'macos-x64'
             cc: '/usr/local/opt/llvm/bin/clang'
             cxx: '/usr/local/opt/llvm/bin/clang++'
