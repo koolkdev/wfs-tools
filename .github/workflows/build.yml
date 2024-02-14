@@ -10,7 +10,7 @@ jobs:
   build:
     strategy:
       matrix:
-        platform: [ubuntu-latest, windows-latest, macos-latest]
+        platform: [ubuntu-latest, windows-latest, macos-14]
         include:
           - platform: ubuntu-latest
             configure_preset: "static"
@@ -59,10 +59,10 @@ jobs:
           rm /usr/local/bin/python3 || true
           rm /usr/local/bin/python3-config || true
           brew install llvm
-          /usr/local/opt/llvm/bin/clang++ -v
           brew install macfuse
           echo "LDFLAGS=-L/usr/local/opt/llvm/lib" >> $GITHUB_ENV
           echo "CXXFLAGS=-isystem /usr/local/opt/llvm/include" >> $GITHUB_ENV
+          /usr/local/opt/llvm/bin/clang++ -v
         shell: bash
         if: matrix.platform == 'macos-latest'
 
