@@ -16,8 +16,8 @@ jobs:
             configure_preset: "static"
             build_preset: "static-release"
             release_name: "linux-x86-64"
-            cc: "gcc-12"
-            cxx: "g++-12"
+            cc: "gcc-13"
+            cxx: "g++-13"
 
           - platform: windows-latest
             configure_preset: "windows-static"
@@ -46,7 +46,7 @@ jobs:
           vcpkgJsonGlob: "vcpkg.json"
 
       - name: Install requirements
-        run: sudo apt install libfuse-dev
+        run: sudo apt install libfuse-dev gcc-13 g++-13
         if: matrix.platform == 'ubuntu-latest'
 
       - name: Install requirements (MacOS)
