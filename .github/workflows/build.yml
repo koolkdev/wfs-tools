@@ -24,7 +24,7 @@ jobs:
             build_preset: "windows-static-release"
             release_name: "windows-x64"
 
-          - platform: macos-latest
+          - platform: macos-14
             configure_preset: "default"
             build_preset: "release"
             release_name: "macos-x64"
@@ -64,7 +64,7 @@ jobs:
           echo "CXXFLAGS=-isystem /usr/local/opt/llvm/include" >> $GITHUB_ENV
           /usr/local/opt/llvm/bin/clang++ -v
         shell: bash
-        if: matrix.platform == 'macos-latest'
+        if: matrix.platform == 'macos-14'
 
       - name: Set compiler
         run: |
