@@ -10,6 +10,7 @@
 #include <boost/program_options.hpp>
 #include <cstdio>
 #include <filesystem>
+#include <format>
 #include <fstream>
 #include <iostream>
 #include <memory>
