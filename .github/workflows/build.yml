@@ -24,12 +24,12 @@ jobs:
             build_preset: "windows-static-release"
             release_name: "windows-x64"
 
-          - platform: macos-14
+          - platform: macos-13
             configure_preset: "default"
             build_preset: "release"
             release_name: "macos-x64"
-            cc: "/opt/homebrew/opt/llvm/bin/clang"
-            cxx: "/opt/homebrew/opt/llvm/bin/clang++"
+            cc: "/usr/local/opt/llvm/bin/clang"
+            cxx: "/usr/local/opt/llvm/bin/clang++"
 
     runs-on: ${{matrix.platform}}
 
@@ -60,11 +60,10 @@ jobs:
           rm /usr/local/bin/python3-config || true
           brew install llvm
           brew install macfuse
-          echo "LDFLAGS=-L/opt/homebrew/opt/llvm/lib" >> $GITHUB_ENV
-          echo "CXXFLAGS=-isystem /opt/homebrew/opt/llvm/include" >> $GITHUB_ENV
-          /opt/homebrew/opt/llvm/bin/clang++ -v
+          echo "LDFLAGS=-L/usr/local/opt/llvm/lib" >> $GITHUB_ENV
+          echo "CXXFLAGS=-isystem /usr/local/opt/llvm/include" >> $GITHUB_ENV
         shell: bash
-        if: matrix.platform == 'macos-14'
+        if: matrix.platform == 'macos-latest'
 
       - name: Set compiler
         run: |
