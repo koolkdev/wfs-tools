@@ -10,7 +10,7 @@ jobs:
   build:
     strategy:
       matrix:
-        platform: [ubuntu-latest, windows-latest, macos-13]
+        platform: [ubuntu-latest, windows-latest, macos-13, macos-14]
         include:
           - platform: ubuntu-latest
             configure_preset: "static"
@@ -30,6 +30,13 @@ jobs:
             release_name: "macos-x64"
             cc: "/usr/local/opt/llvm/bin/clang"
             cxx: "/usr/local/opt/llvm/bin/clang++"
+
+          - platform: macos-14
+            configure_preset: "default"
+            build_preset: "release"
+            release_name: "macos-arm64"
+            cc: "/opt/homebrew/opt/llvm/bin/clang"
+            cxx: "/opt/homebrew/opt/llvm/bin/clang++"
 
     runs-on: ${{matrix.platform}}
 
@@ -64,6 +71,16 @@ jobs:
           echo "CXXFLAGS=-isystem /usr/local/opt/llvm/include" >> $GITHUB_ENV
         shell: bash
         if: matrix.platform == 'macos-13'
+
+      - name: Install requirements (MacOS arm64)
+        run: |
+          brew update
+          brew install llvm
+          brew install macfuse
+          echo "LDFLAGS=-L/opt/homebrew/opt/llvm/lib" >> $GITHUB_ENV
+          echo "CXXFLAGS=-isystem /opt/homebrew/opt/llvm/include" >> $GITHUB_ENV
+        shell: bash
+        if: matrix.platform == 'macos-14'
 
       - name: Set compiler
         run: |
