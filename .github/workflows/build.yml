@@ -10,7 +10,7 @@ jobs:
   build:
     strategy:
       matrix:
-        platform: [ubuntu-latest, windows-latest, macos-14]
+        platform: [ubuntu-latest, windows-latest, macos-13]
         include:
           - platform: ubuntu-latest
             configure_preset: "static"
@@ -63,7 +63,7 @@ jobs:
           echo "LDFLAGS=-L/usr/local/opt/llvm/lib" >> $GITHUB_ENV
           echo "CXXFLAGS=-isystem /usr/local/opt/llvm/include" >> $GITHUB_ENV
         shell: bash
-        if: matrix.platform == 'macos-latest'
+        if: matrix.platform == 'macos-13'
 
       - name: Set compiler
         run: |
