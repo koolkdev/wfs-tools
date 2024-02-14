@@ -77,19 +77,14 @@ void dumpdir(int depth, const std::shared_ptr<Directory>& dir, const std::filesy
     dumpArea(depth, path, dir->area());
     depth += 1;
   }
-  for (auto [name, item] : *dir) {
+  for (auto [name, item_or_error] : *dir) {
     auto const npath = path / name;
-    if (!item.has_value()) {
-      std::cout << std::format("Error: Failed to dump item {} ({})\n", prettify_path(npath),
-                               WfsException(item.error()).what());
-      continue;
-    }
-    if ((*item)->IsDirectory()) {
-      try {
-        dumpdir(depth, std::dynamic_pointer_cast<Directory>(*item), npath);
-      } catch (const WfsException& e) {
-        std::cout << std::format("Error: Failed to dump folder {} ({})\n", prettify_path(npath), e.what());
-      }
+    try {
+      auto item = throw_if_error(item_or_error);
+      if (item->IsDirectory())
+        dumpdir(depth, std::dynamic_pointer_cast<Directory>(item), npath);
+    } catch (const WfsException& e) {
+      std::cout << std::format("Error: Failed to dump {} ({})\n", prettify_path(npath), e.what());
     }
   }
 }

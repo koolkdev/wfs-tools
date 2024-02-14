@@ -36,8 +36,8 @@ void dumpdir(const std::filesystem::path& target,
   }
   for (auto [name, item_or_error] : *dir) {
     auto const npath = path / name;
-    auto item = throw_if_error(item_or_error);
     try {
+      auto item = throw_if_error(item_or_error);
       if (verbose)
         std::cout << "Dumping /" << npath.generic_string() << std::endl;
       if (item->IsDirectory()) {
@@ -61,7 +61,7 @@ void dumpdir(const std::filesystem::path& target,
         output_file.close();
       }
     } catch (const WfsException& e) {
-      std::cout << std::format("Error: Failed to dump folder {} ({})\n", prettify_path(npath), e.what());
+      std::cout << std::format("Error: Failed to dump {} ({})\n", prettify_path(npath), e.what());
     }
   }
 }
