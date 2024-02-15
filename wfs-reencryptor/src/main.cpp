@@ -75,8 +75,6 @@ std::string inline prettify_path(const std::filesystem::path& path) {
   return "/" + path.generic_string();
 }
 
-constexpr int blocks_counts[] = {0, 3, 6, 10, 14, 18, 22, 26};
-
 void exploreDir(const std::shared_ptr<Directory>& dir, const std::filesystem::path& path, bool shadow = false) {
   if (!shadow && dir->IsQuota()) {
     // It is an area, iterate its allocator
