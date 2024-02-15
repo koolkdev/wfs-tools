@@ -220,13 +220,13 @@ int main(int argc, char* argv[]) {
     }
     auto input_device = std::make_shared<FileDevice>(vm["input"].as<std::string>(), 9);
     Wfs::DetectDeviceSectorSizeAndCount(input_device, input_key);
+    auto output_device =
+        std::make_shared<FileDevice>(vm["output"].as<std::string>(), input_device->Log2SectorSize(),
+                                     input_device->SectorsCount(), /*read_only=*/false, /*create=*/true);
     std::cout << "Exploring blocks..." << std::endl;
     auto reencryptor = std::make_shared<ReencryptorBlocksDevice>(input_device, input_key);
     exploreDir(throw_if_error(Wfs(reencryptor).GetRootArea()->GetRootDirectory()), {});
     std::cout << std::format("Found {} blocks! Reencrypting...\n", reencryptor->blocks().size());
-    auto output_device =
-        std::make_shared<FileDevice>(vm["output"].as<std::string>(), input_device->Log2SectorSize(),
-                                     input_device->SectorsCount(), /*read_only=*/false, /*create=*/true);
     reencryptor->Reencrypt(std::make_shared<BlocksDevice>(output_device, output_key));
     std::cout << "Done!" << std::endl;
   } catch (std::exception& e) {
