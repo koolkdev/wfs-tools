@@ -182,10 +182,11 @@ int main(int argc, char* argv[]) {
       bad = true;
     }
     if (vm.count("help") || bad) {
-      std::cout
-          << "Usage: wfs-reencryptor --input <input file> --output <output file> --input-otp <otp path> --output-otp "
-             "<otp path> [--input-seeprom <seeprom path> --output-seeprom <seeprom path>] [--mlc] [--usb]"
-          << std::endl;
+      std::cout << "Usage: wfs-reencryptor --input <input file> --output <output file> --input-otp <input otp path> "
+                   "--output-otp "
+                   "<output otp path> [--input-seeprom <input seeprom path> --output-seeprom <outpu seeprom path>] "
+                   "[--mlc] [--usb]"
+                << std::endl;
       std::cout << desc << "\n";
       return 1;
     }
