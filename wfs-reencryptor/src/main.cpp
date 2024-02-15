@@ -85,6 +85,8 @@ void exploreDir(const std::shared_ptr<Directory>& dir, const std::filesystem::pa
       for (const auto& [tree_block_number, free_tree] : allocator->tree()) {
         for (const auto& free_tree_per_size : free_tree) {
           for (const auto& [block_number, blocks_count] : free_tree_per_size) {
+            std::ignore = block_number;
+            std::ignore = blocks_count;
           }
         }
       }
