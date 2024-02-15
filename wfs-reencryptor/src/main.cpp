@@ -33,6 +33,7 @@ class ReencryptorBlocksDevice : public BlocksDevice {
   };
   ReencryptorBlocksDevice(const std::shared_ptr<Device>& device, const std::span<std::byte>& key)
       : BlocksDevice(device, key) {}
+  ~ReencryptorBlocksDevice() final override = default;
 
   bool ReadBlock(uint32_t block_number,
                  uint32_t size_in_blocks,
