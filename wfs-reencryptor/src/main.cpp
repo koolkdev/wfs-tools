@@ -23,7 +23,7 @@
 #include "../../wfslib/src/device_encryption.h"
 #include "../../wfslib/src/free_blocks_allocator.h"
 
-class ReencryptorBlocksDevice : public BlocksDevice {
+class ReencryptorBlocksDevice final : public BlocksDevice {
  public:
   struct BlockInfo {
     uint32_t data_size;
