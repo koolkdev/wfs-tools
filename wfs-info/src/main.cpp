@@ -24,13 +24,13 @@ std::string inline prettify_path(const std::filesystem::path& path) {
 
 constexpr int blocks_counts[] = {0, 3, 6, 10, 14, 18, 22, 26};
 
-void dumpArea(int depth, const std::filesystem::path& path, const std::shared_ptr<const Area>& area) {
+void dumpArea(int depth, const std::filesystem::path& path, const std::shared_ptr<Area>& area) {
   std::string padding(depth, '\t');
   std::cout << std::format("{}Area {} [0x{:08x}-0x{:08x}]:\n", padding, prettify_path(path), area->BlockNumber(),
                            area->AbsoluteBlockNumber(area->BlocksCount()));
 
   padding += '\t';
-  auto allocator = throw_if_error(area->GetFreeBlocksAllocator());
+  std::shared_ptr<const FreeBlocksAllocator> allocator = throw_if_error(area->GetFreeBlocksAllocator());
   std::cout << std::format("{}Free blocks: 0x{:08x}\n", padding, allocator->header()->free_blocks_count.value());
   std::cout << std::format("{}Free metadata blocks: 0x{:08x}\n", padding,
                            allocator->header()->free_metadata_blocks_count.value());
