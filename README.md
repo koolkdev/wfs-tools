@@ -52,20 +52,18 @@ options:
 wfs-fuse --help
 ```
 ```
-usage: wfs-fuse <device_file> <mountpoint> --otp <otp_path> [--seeprom <seeprom_path>] [--usb] [--mlc] [fuse options]
+usage: wfs-fuse <device_file> <mountpoint> [--type <file type>] [--otp <otp_path> [--seeprom <seeprom_path>]] [fuse options]
 
 options:
     --help|-h              print this help message
-    --otp <path>           otp file
-    --seeprom <path>       seeprom file (required if usb)
-    --usb                  device is usb (default)
-    --mlc                  device is mlc
+    --type [usb/mlc/plain] type of device
+    --otp <path>           otp file (for mlc and usb modes)
+    --seeprom <path>       seeprom file (for usb mode)
     -d   -o debug          enable debug output (implies -f)
     -o default_permissions check access permission instead the operation system
     -o allow_other         allow access to the mount for all users
     -f                     foreground operation
     -s                     disable multi-threaded operation
-
 ```
 
 ### wfs-file-injector
