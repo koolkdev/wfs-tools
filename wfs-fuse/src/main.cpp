@@ -123,23 +123,18 @@ static const char* usage =
 
 struct wfs_param {
   char* file;
+  char* mode;
   char* otp;
   char* seeprom;
-  int is_usb;
-  int is_mlc;
   int is_help;
 };
 
 #define WFS_OPT(t, p) \
   { t, offsetof(struct wfs_param, p), 1 }
 
-static const struct fuse_opt wfs_opts[] = {WFS_OPT("--otp %s", otp),
-                                           WFS_OPT("--seeprom %s", seeprom),
-                                           WFS_OPT("--usb", is_usb),
-                                           WFS_OPT("--mlc", is_mlc),
-                                           FUSE_OPT_KEY("-h", 0),
-                                           FUSE_OPT_KEY("--help", 0),
-                                           FUSE_OPT_END};
+static const struct fuse_opt wfs_opts[] = {WFS_OPT("--mode %s", mode),       WFS_OPT("--otp %s", otp),
+                                           WFS_OPT("--seeprom %s", seeprom), FUSE_OPT_KEY("-h", 0),
+                                           FUSE_OPT_KEY("--help", 0),        FUSE_OPT_END};
 
 static int wfs_process_arg(void* data, const char* arg, int key, struct fuse_args* outargs) {
   struct wfs_param* param = static_cast<wfs_param*>(data);
@@ -164,9 +159,32 @@ static int wfs_process_arg(void* data, const char* arg, int key, struct fuse_arg
   }
 }
 
+std::optional<std::vector<std::byte>> get_key(std::string mode,
+                                              std::optional<std::string> otp_path,
+                                              std::optional<std::string> seeprom_path) {
+  if (mode == "mlc") {
+    if (!otp_path)
+      throw std::runtime_error("missing otp");
+    std::unique_ptr<OTP> otp(OTP::LoadFromFile(*otp_path));
+    return otp->GetMLCKey();
+  } else if (mode == "usb") {
+    if (!otp_path || !seeprom_path)
+      throw std::runtime_error("missing seeprom");
+    std::unique_ptr<OTP> otp(OTP::LoadFromFile(*otp_path));
+    std::unique_ptr<SEEPROM> seeprom(SEEPROM::LoadFromFile(*seeprom_path));
+    return seeprom->GetUSBKey(*otp);
+  } else if (mode == "plain") {
+    return std::nullopt;
+  } else {
+    throw std::runtime_error("unexpected mode");
+  }
+}
+
 int main(int argc, char* argv[]) {
   struct fuse_args args = FUSE_ARGS_INIT(argc, argv);
   struct wfs_param param = {NULL, NULL, NULL, 0, 0, 0};
+  bool is_usb, is_mlc, is_plain;
+  std::optional<std::string> otp_path, seeprom_path;
 
   if (argc < 3) {
     fprintf(stderr, "%s", usage);
@@ -180,51 +198,27 @@ int main(int argc, char* argv[]) {
   if (param.is_help) {
     return 0;
   }
-  if (!param.otp) {
+  if (!param.mode) {
+    printf("Missing mode (--otp)\n");
+    return 1;
+  }
+  is_usb = !param.mode || !strcmp(param.mode, "usb");
+  is_mlc = param.mode && !strcmp(param.mode, "mlc");
+  is_plain = param.mode && !strcmp(param.mode, "plain");
+  if ((is_mlc || is_usb) !param.otp) {
     printf("Missing otp file (--otp)\n");
     return 1;
   }
-  if (!param.is_mlc && !param.seeprom) {
+  if (is_usb && !param.seeprom) {
     printf("Missing seeprom file (--seeprom)\n");
     return 1;
   }
-  if (param.is_usb && param.is_mlc) {
-    printf("Can't specify both --mlc and --usb\n");
-    return 1;
-  }
+  if (params.otp)
+    otp_path = params.otp;
+  if (params.seeprom)
+    seeprom_path = params.seeprom;
 
-  try {
-    std::vector<std::byte> key;
-    std::unique_ptr<OTP> otp;
-    // open otp
-    try {
-      otp.reset(OTP::LoadFromFile(param.otp));
-    } catch (std::exception& e) {
-      std::cerr << "Failed to open OTP: " << e.what() << std::endl;
-      return 1;
-    }
-
-    if (param.is_mlc) {
-      // mlc
-      key = otp->GetMLCKey();
-    } else {
-      // usb
-      std::unique_ptr<SEEPROM> seeprom;
-      try {
-        seeprom.reset(SEEPROM::LoadFromFile(param.seeprom));
-      } catch (std::exception& e) {
-        std::cerr << "Failed to open SEEPROM: " << e.what() << std::endl;
-        return 1;
-      }
-      key = seeprom->GetUSBKey(*otp);
-    }
-    auto device = std::make_shared<FileDevice>(param.file, 9);
-    Wfs::DetectDeviceSectorSizeAndCount(device, key);
-    wfs.reset(new Wfs(device, key));
-  } catch (std::exception& e) {
-    std::cerr << "Error: " << e.what() << std::endl;
-    return 1;
-  }
+  auto key = get_key(param.mode, otp_path, seeprom_path);
 
   struct fuse_operations wfs_oper = {};
   wfs_oper.getattr = wfs_getattr;
