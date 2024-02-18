@@ -182,7 +182,7 @@ std::optional<std::vector<std::byte>> get_key(std::string mode,
 
 int main(int argc, char* argv[]) {
   struct fuse_args args = FUSE_ARGS_INIT(argc, argv);
-  struct wfs_param param = {NULL, NULL, NULL, 0, 0, 0};
+  struct wfs_param param = {NULL, NULL, NULL, NULL, 0};
   bool is_usb, is_mlc, is_plain;
   std::optional<std::string> otp_path, seeprom_path;
 
@@ -205,7 +205,7 @@ int main(int argc, char* argv[]) {
   is_usb = !param.mode || !strcmp(param.mode, "usb");
   is_mlc = param.mode && !strcmp(param.mode, "mlc");
   is_plain = param.mode && !strcmp(param.mode, "plain");
-  if ((is_mlc || is_usb) !param.otp) {
+  if ((is_mlc || is_usb) && !param.otp) {
     printf("Missing otp file (--otp)\n");
     return 1;
   }
@@ -213,10 +213,10 @@ int main(int argc, char* argv[]) {
     printf("Missing seeprom file (--seeprom)\n");
     return 1;
   }
-  if (params.otp)
-    otp_path = params.otp;
-  if (params.seeprom)
-    seeprom_path = params.seeprom;
+  if (param.otp)
+    otp_path = param.otp;
+  if (param.seeprom)
+    seeprom_path = param.seeprom;
 
   auto key = get_key(param.mode, otp_path, seeprom_path);
 
