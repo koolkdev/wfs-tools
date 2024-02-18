@@ -202,7 +202,7 @@ int main(int argc, char* argv[]) {
     return 1;
   }
   is_usb = !param.type || !strcmp(param.type, "usb");
-  is_mlc = param.modtypee && !strcmp(param.type, "mlc");
+  is_mlc = param.type && !strcmp(param.type, "mlc");
   is_plain = param.type && !strcmp(param.type, "plain");
   if (!is_usb && !is_mlc && !is_plain) {
     printf("Unsupported type (--type=usb/mlc/plain)\n");
