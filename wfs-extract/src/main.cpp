@@ -94,7 +94,7 @@ int main(int argc, char* argv[]) {
     std::optional<std::string> seeprom_path, otp_path;
 
     try {
-      boost::program_options::options_description desc("Options");
+      boost::program_options::options_description desc("options");
       desc.add_options()("help", "produce help message");
 
       desc.add_options()("input", boost::program_options::value<std::string>(&input_path)->required(), "input file")(
@@ -111,9 +111,10 @@ int main(int argc, char* argv[]) {
       boost::program_options::store(boost::program_options::parse_command_line(argc, argv, desc), vm);
 
       if (vm.count("help")) {
-        std::cout << "wfs-info --input <input file> [--type <type>]" << std::endl
-                  << "         [--otp <path> [--seeprom <path>]]" << std::endl
-                  << "         [--dump-path <directory to dump>] [--verbose]" << std::endl;
+        std::cout << "usage: wfs-extract --input <input file> [--type <type>]" << std::endl
+                  << "                   [--otp <path> [--seeprom <path>]]" << std::endl
+                  << "                   [--dump-path <directory to dump>] [--verbose]" << std::endl
+                  << std::endl;
         std::cout << desc << std::endl;
         return 0;
       }

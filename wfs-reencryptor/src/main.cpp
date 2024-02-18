@@ -166,7 +166,7 @@ int main(int argc, char* argv[]) {
     std::optional<std::string> output_path, input_seeprom_path, input_otp_path, output_seeprom_path, output_otp_path;
 
     try {
-      boost::program_options::options_description desc("Options");
+      boost::program_options::options_description desc("options");
       desc.add_options()("help", "produce help message");
 
       desc.add_options()("input", boost::program_options::value<std::string>(&input_path)->required(), "input file")(
@@ -185,9 +185,11 @@ int main(int argc, char* argv[]) {
       boost::program_options::store(boost::program_options::parse_command_line(argc, argv, desc), vm);
 
       if (vm.count("help")) {
-        std::cout << "wfs-reencryptor --input <input file> [--output <output file>]" << std::endl
-                  << "                [--input-type <type>] [--input-otp <path> [--input-seeprom <path>]]" << std::endl
-                  << "                [--output-type <type>] [--output-otp <path> [--output-seeprom <path>]]"
+        std::cout << "usage: wfs-reencryptor --input <input file> [--output <output file>]" << std::endl
+                  << "                       [--input-type <type>] [--input-otp <path> [--input-seeprom <path>]]"
+                  << std::endl
+                  << "                       [--output-type <type>] [--output-otp <path> [--output-seeprom <path>]]"
+                  << std::endl
                   << std::endl;
         std::cout << desc << std::endl;
         return 0;
