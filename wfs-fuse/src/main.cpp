@@ -221,7 +221,15 @@ int main(int argc, char* argv[]) {
   if (param.seeprom)
     seeprom_path = param.seeprom;
 
-  auto key = get_key(param.type, otp_path, seeprom_path);
+  try {
+    auto key = get_key(param.type, otp_path, seeprom_path);
+    auto device = std::make_shared<FileDevice>(param.file, 9);
+    Wfs::DetectDeviceSectorSizeAndCount(device, key);
+    wfs.reset(new Wfs(device, key));
+  } catch (std::exception& e) {
+    std::cerr << "Error: " << e.what() << std::endl;
+    return 1;
+  }
 
   struct fuse_operations wfs_oper = {};
   wfs_oper.getattr = wfs_getattr;
