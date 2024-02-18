@@ -105,8 +105,8 @@ int wfs_readlink(const char* path, [[maybe_unused]] char* buf, [[maybe_unused]] 
 }
 
 static const char* usage =
-    "usage: wfs-fuse <device_file> <mountpoint> --otp <otp_path> [--seeprom <seeprom_path>] [--usb] [--mlc] [fuse "
-    "options]\n"
+    "usage: wfs-fuse <device_file> <mountpoint> [--type <file type>] [--otp <otp_path> [--seeprom <seeprom_path>]] "
+    "[fuse options]\n"
     "\n"
     "options:\n"
     "    --help|-h              print this help message\n"
