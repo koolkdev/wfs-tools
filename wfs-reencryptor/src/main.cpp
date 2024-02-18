@@ -139,30 +139,30 @@ void exploreDir(const std::shared_ptr<Directory>& dir, const std::filesystem::pa
   }
 }
 
-std::optional<std::vector<std::byte>> get_key(std::string mode,
+std::optional<std::vector<std::byte>> get_key(std::string type,
                                               std::optional<std::string> otp_path,
                                               std::optional<std::string> seeprom_path) {
-  if (mode == "mlc") {
+  if (type == "mlc") {
     if (!otp_path)
       throw std::runtime_error("missing otp");
     std::unique_ptr<OTP> otp(OTP::LoadFromFile(*otp_path));
     return otp->GetMLCKey();
-  } else if (mode == "usb") {
+  } else if (type == "usb") {
     if (!otp_path || !seeprom_path)
       throw std::runtime_error("missing seeprom");
     std::unique_ptr<OTP> otp(OTP::LoadFromFile(*otp_path));
     std::unique_ptr<SEEPROM> seeprom(SEEPROM::LoadFromFile(*seeprom_path));
     return seeprom->GetUSBKey(*otp);
-  } else if (mode == "plain") {
+  } else if (type == "plain") {
     return std::nullopt;
   } else {
-    throw std::runtime_error("unexpected mode");
+    throw std::runtime_error("unexpected type");
   }
 }
 
 int main(int argc, char* argv[]) {
   try {
-    std::string input_path, input_mode, output_mode;
+    std::string input_path, input_type, output_type;
     std::optional<std::string> output_path, input_seeprom_path, input_otp_path, output_seeprom_path, output_otp_path;
 
     try {
@@ -170,24 +170,24 @@ int main(int argc, char* argv[]) {
       desc.add_options()("help", "produce help message");
 
       desc.add_options()("input", boost::program_options::value<std::string>(&input_path)->required(), "input file")(
-          "input-mode", boost::program_options::value<std::string>(&input_mode)->default_value("usb")->required(),
-          "input file mode (usb/mlc/plain)")("input-otp", boost::program_options::value<std::string>(),
-                                             "input otp file (for usb/mlc modes)")(
-          "input-seeprom", boost::program_options::value<std::string>(), "input seeprom file (for usb mode)");
+          "input-type", boost::program_options::value<std::string>(&input_type)->default_value("usb")->required(),
+          "input file type (usb/mlc/plain)")("input-otp", boost::program_options::value<std::string>(),
+                                             "input otp file (for usb/mlc types)")(
+          "input-seeprom", boost::program_options::value<std::string>(), "input seeprom file (for usb type)");
 
       desc.add_options()("output", boost::program_options::value<std::string>(),
                          "output file (default: reencrypt the input file)")(
-          "output-mode", boost::program_options::value<std::string>(), "output file mode (default: same as input)")(
-          "output-otp", boost::program_options::value<std::string>(), "output otp file (for usb/mlc modes)")(
-          "output-seeprom", boost::program_options::value<std::string>(), "output seeprom file (for usb mode)");
+          "output-type", boost::program_options::value<std::string>(), "output file type (default: same as input)")(
+          "output-otp", boost::program_options::value<std::string>(), "output otp file (for usb/mlc types)")(
+          "output-seeprom", boost::program_options::value<std::string>(), "output seeprom file (for usb type)");
 
       boost::program_options::variables_map vm;
       boost::program_options::store(boost::program_options::parse_command_line(argc, argv, desc), vm);
 
       if (vm.count("help")) {
         std::cout << "wfs-reencryptor --input <input file> [--output <output file>]" << std::endl
-                  << "                [--input-mode <mode>] [--input-otp <path> [--input-seeprom <path>]]" << std::endl
-                  << "                [--output-mode <mode>] [--output-otp <path> [--output-seeprom <path>]]"
+                  << "                [--input-type <type>] [--input-otp <path> [--input-seeprom <path>]]" << std::endl
+                  << "                [--output-type <type>] [--output-otp <path> [--output-seeprom <path>]]"
                   << std::endl;
         std::cout << desc << std::endl;
         return 0;
@@ -200,7 +200,7 @@ int main(int argc, char* argv[]) {
       if (vm.count("output"))
         output_path = vm["output"].as<std::string>();
 
-      output_mode = vm.count("output-mode") ? vm["output-mode"].as<std::string>() : input_mode;
+      output_type = vm.count("output-type") ? vm["output-type"].as<std::string>() : input_type;
 
       if (vm.count("input-otp"))
         input_otp_path = vm["input-otp"].as<std::string>();
@@ -211,17 +211,17 @@ int main(int argc, char* argv[]) {
       if (vm.count("output-seeprom"))
         output_seeprom_path = vm["output-seeprom"].as<std::string>();
 
-      if (input_mode != "usb" && input_mode != "mlc" && input_mode != "plain")
-        throw boost::program_options::error("Invalid input mode (valid modes: usb/mlc/plain)");
-      if (output_mode != "usb" && output_mode != "mlc" && output_mode != "plain")
-        throw boost::program_options::error("Invalid output mode (valid modes: usb/mlc/plain)");
-      if (input_mode != "plain" && !input_otp_path)
+      if (input_type != "usb" && input_type != "mlc" && input_type != "plain")
+        throw boost::program_options::error("Invalid input type (valid types: usb/mlc/plain)");
+      if (output_type != "usb" && output_type != "mlc" && output_type != "plain")
+        throw boost::program_options::error("Invalid output type (valid types: usb/mlc/plain)");
+      if (input_type != "plain" && !input_otp_path)
         throw boost::program_options::error("Missing --input-otp");
-      if (output_mode != "plain" && !output_otp_path)
+      if (output_type != "plain" && !output_otp_path)
         throw boost::program_options::error("Missing --output-otp");
-      if (input_mode == "usb" && !input_seeprom_path)
+      if (input_type == "usb" && !input_seeprom_path)
         throw boost::program_options::error("Missing --input-seeprom");
-      if (output_mode == "usb" && !output_seeprom_path)
+      if (output_type == "usb" && !output_seeprom_path)
         throw boost::program_options::error("Missing --output-seeprom");
 
     } catch (const boost::program_options::error& e) {
@@ -230,8 +230,8 @@ int main(int argc, char* argv[]) {
       return 1;
     }
 
-    auto input_key = get_key(input_mode, input_otp_path, input_seeprom_path);
-    auto output_key = get_key(output_mode, output_otp_path, output_seeprom_path);
+    auto input_key = get_key(input_type, input_otp_path, input_seeprom_path);
+    auto output_key = get_key(output_type, output_otp_path, output_seeprom_path);
 
     auto input_device = std::make_shared<FileDevice>(input_path, 9, 0, !!output_path);
     Wfs::DetectDeviceSectorSizeAndCount(input_device, input_key);

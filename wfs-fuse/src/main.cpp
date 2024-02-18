@@ -110,10 +110,9 @@ static const char* usage =
     "\n"
     "options:\n"
     "    --help|-h              print this help message\n"
-    "    --otp <path>           otp file\n"
-    "    --seeprom <path>       seeprom file (required if usb)\n"
-    "    --usb                  device is usb (default)\n"
-    "    --mlc                  device is mlc\n"
+    "    --type [usb/mlc/plain] type of device\n"
+    "    --otp <path>           otp file (for mlc and usb modes)\n"
+    "    --seeprom <path>       seeprom file (for usb mode)\n"
     "    -d   -o debug          enable debug output (implies -f)\n"
     "    -o default_permissions check access permission instead the operation system\n"
     "    -o allow_other         allow access to the mount for all users\n"
@@ -123,7 +122,7 @@ static const char* usage =
 
 struct wfs_param {
   char* file;
-  char* mode;
+  char* type;
   char* otp;
   char* seeprom;
   int is_help;
@@ -132,7 +131,7 @@ struct wfs_param {
 #define WFS_OPT(t, p) \
   { t, offsetof(struct wfs_param, p), 1 }
 
-static const struct fuse_opt wfs_opts[] = {WFS_OPT("--mode %s", mode),       WFS_OPT("--otp %s", otp),
+static const struct fuse_opt wfs_opts[] = {WFS_OPT("--type %s", type),       WFS_OPT("--otp %s", otp),
                                            WFS_OPT("--seeprom %s", seeprom), FUSE_OPT_KEY("-h", 0),
                                            FUSE_OPT_KEY("--help", 0),        FUSE_OPT_END};
 
@@ -159,24 +158,24 @@ static int wfs_process_arg(void* data, const char* arg, int key, struct fuse_arg
   }
 }
 
-std::optional<std::vector<std::byte>> get_key(std::string mode,
+std::optional<std::vector<std::byte>> get_key(std::string type,
                                               std::optional<std::string> otp_path,
                                               std::optional<std::string> seeprom_path) {
-  if (mode == "mlc") {
+  if (type == "mlc") {
     if (!otp_path)
       throw std::runtime_error("missing otp");
     std::unique_ptr<OTP> otp(OTP::LoadFromFile(*otp_path));
     return otp->GetMLCKey();
-  } else if (mode == "usb") {
+  } else if (type == "usb") {
     if (!otp_path || !seeprom_path)
       throw std::runtime_error("missing seeprom");
     std::unique_ptr<OTP> otp(OTP::LoadFromFile(*otp_path));
     std::unique_ptr<SEEPROM> seeprom(SEEPROM::LoadFromFile(*seeprom_path));
     return seeprom->GetUSBKey(*otp);
-  } else if (mode == "plain") {
+  } else if (type == "plain") {
     return std::nullopt;
   } else {
-    throw std::runtime_error("unexpected mode");
+    throw std::runtime_error("unexpected type");
   }
 }
 
@@ -198,13 +197,17 @@ int main(int argc, char* argv[]) {
   if (param.is_help) {
     return 0;
   }
-  if (!param.mode) {
-    printf("Missing mode (--otp)\n");
+  if (!param.type) {
+    printf("Missing type (--otp)\n");
     return 1;
   }
-  is_usb = !param.mode || !strcmp(param.mode, "usb");
-  is_mlc = param.mode && !strcmp(param.mode, "mlc");
-  is_plain = param.mode && !strcmp(param.mode, "plain");
+  is_usb = !param.type || !strcmp(param.type, "usb");
+  is_mlc = param.modtypee && !strcmp(param.type, "mlc");
+  is_plain = param.type && !strcmp(param.type, "plain");
+  if (!is_usb && !is_mlc && !is_plain) {
+    printf("Unsupported type (--type=usb/mlc/plain)\n");
+    return 1;
+  }
   if ((is_mlc || is_usb) && !param.otp) {
     printf("Missing otp file (--otp)\n");
     return 1;
@@ -218,7 +221,7 @@ int main(int argc, char* argv[]) {
   if (param.seeprom)
     seeprom_path = param.seeprom;
 
-  auto key = get_key(param.mode, otp_path, seeprom_path);
+  auto key = get_key(param.type, otp_path, seeprom_path);
 
   struct fuse_operations wfs_oper = {};
   wfs_oper.getattr = wfs_getattr;

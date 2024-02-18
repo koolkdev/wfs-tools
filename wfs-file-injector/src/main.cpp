@@ -14,30 +14,30 @@
 
 #include <wfslib/wfslib.h>
 
-std::optional<std::vector<std::byte>> get_key(std::string mode,
+std::optional<std::vector<std::byte>> get_key(std::string type,
                                               std::optional<std::string> otp_path,
                                               std::optional<std::string> seeprom_path) {
-  if (mode == "mlc") {
+  if (type == "mlc") {
     if (!otp_path)
       throw std::runtime_error("missing otp");
     std::unique_ptr<OTP> otp(OTP::LoadFromFile(*otp_path));
     return otp->GetMLCKey();
-  } else if (mode == "usb") {
+  } else if (type == "usb") {
     if (!otp_path || !seeprom_path)
       throw std::runtime_error("missing seeprom");
     std::unique_ptr<OTP> otp(OTP::LoadFromFile(*otp_path));
     std::unique_ptr<SEEPROM> seeprom(SEEPROM::LoadFromFile(*seeprom_path));
     return seeprom->GetUSBKey(*otp);
-  } else if (mode == "plain") {
+  } else if (type == "plain") {
     return std::nullopt;
   } else {
-    throw std::runtime_error("unexpected mode");
+    throw std::runtime_error("unexpected type");
   }
 }
 
 int main(int argc, char* argv[]) {
   try {
-    std::string input_path, mode, inject_file, inject_path;
+    std::string input_path, type, inject_file, inject_path;
     std::optional<std::string> seeprom_path, otp_path;
 
     try {
@@ -46,10 +46,10 @@ int main(int argc, char* argv[]) {
 
       desc.add_options()("image", boost::program_options::value<std::string>(&input_path)->required(),
                          "wfs image file")(
-          "mode", boost::program_options::value<std::string>(&mode)->default_value("usb")->required(),
-          "file mode (usb/mlc/plain)")("otp", boost::program_options::value<std::string>(),
-                                       "otp file (for usb/mlc modes)")(
-          "seeprom", boost::program_options::value<std::string>(), "seeprom file (for usb mode)");
+          "type", boost::program_options::value<std::string>(&type)->default_value("usb")->required(),
+          "file type (usb/mlc/plain)")("otp", boost::program_options::value<std::string>(),
+                                       "otp file (for usb/mlc types)")(
+          "seeprom", boost::program_options::value<std::string>(), "seeprom file (for usb type)");
 
       desc.add_options()("inject-file", boost::program_options::value<std::string>(&inject_file)->required(),
                          "file to inject")("inject-path",
@@ -60,7 +60,7 @@ int main(int argc, char* argv[]) {
       boost::program_options::store(boost::program_options::parse_command_line(argc, argv, desc), vm);
 
       if (vm.count("help")) {
-        std::cout << "wfs-info --image <wfs image> [--mode <mode>]" << std::endl
+        std::cout << "wfs-info --image <wfs image> [--type <type>]" << std::endl
                   << "         [--otp <path> [--seeprom <path>]]" << std::endl
                   << "         --inject-file <file to inject> --inject-path <file path in wfs>" << std::endl;
         std::cout << desc << std::endl;
@@ -75,11 +75,11 @@ int main(int argc, char* argv[]) {
       if (vm.count("seeprom"))
         seeprom_path = vm["seeprom"].as<std::string>();
 
-      if (mode != "usb" && mode != "mlc" && mode != "plain")
-        throw boost::program_options::error("Invalid input mode (valid modes: usb/mlc/plain)");
-      if (mode != "plain" && !otp_path)
+      if (type != "usb" && type != "mlc" && type != "plain")
+        throw boost::program_options::error("Invalid input type (valid types: usb/mlc/plain)");
+      if (type != "plain" && !otp_path)
         throw boost::program_options::error("Missing --otp");
-      if (mode == "usb" && !seeprom_path)
+      if (type == "usb" && !seeprom_path)
         throw boost::program_options::error("Missing --seeprom");
 
     } catch (const boost::program_options::error& e) {
@@ -88,7 +88,7 @@ int main(int argc, char* argv[]) {
       return 1;
     }
 
-    auto key = get_key(mode, otp_path, seeprom_path);
+    auto key = get_key(type, otp_path, seeprom_path);
 
     std::ifstream input_file(inject_file, std::ios::binary | std::ios::in);
     if (input_file.fail()) {
