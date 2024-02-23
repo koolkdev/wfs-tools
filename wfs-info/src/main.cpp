@@ -15,8 +15,8 @@
 #include <vector>
 
 #include <wfslib/wfslib.h>
-#include "../../wfslib/src/area.h"                   // TOOD: Public header?
-#include "../../wfslib/src/free_blocks_allocator.h"  // TOOD: Public header?
+#include "../../wfslib/src/area.h"                        // TOOD: Public header?
+#include "../../wfslib/src/free_blocks_allocator_tree.h"  // TOOD: Public header?
 
 std::string inline prettify_path(const std::filesystem::path& path) {
   return "/" + path.generic_string();
@@ -31,12 +31,11 @@ void dumpArea(int depth, const std::filesystem::path& path, const std::shared_pt
 
   padding += '\t';
   std::shared_ptr<const FreeBlocksAllocator> allocator = throw_if_error(area->GetFreeBlocksAllocator());
-  std::cout << std::format("{}Free blocks: 0x{:08x}\n", padding, allocator->header()->free_blocks_count.value());
+  std::cout << std::format("{}Free blocks: 0x{:08x}\n", padding, allocator->extra_header()->free_blocks_count.value());
   std::cout << std::format("{}Free metadata blocks: 0x{:08x}\n", padding,
-                           allocator->header()->free_metadata_blocks_count.value());
+                           allocator->extra_header()->free_metadata_blocks_count.value());
   std::cout << std::format("{}Free metadata block: 0x{:08x}\n", padding,
-                           area->AbsoluteBlockNumber(allocator->header()->free_metadata_block.value()));
-  std::cout << std::format("{}Unknown: 0x{:08x}\n", padding, allocator->header()->unknown.value());
+                           area->AbsoluteBlockNumber(allocator->extra_header()->free_metadata_block.value()));
 
   if (depth == 0) {
     auto transactions_area = throw_if_error(area->GetTransactionsArea1());
@@ -45,7 +44,7 @@ void dumpArea(int depth, const std::filesystem::path& path, const std::shared_pt
   }
 
   std::map<uint32_t, uint32_t> free_ranges;
-  for (const auto& [tree_block_number, free_tree] : allocator->tree()) {
+  for (const auto& [tree_block_number, free_tree] : *allocator) {
     int size = 0;
     for (const auto& free_tree_per_size : free_tree) {
       for (const auto& [block_number, blocks_count] : free_tree_per_size) {
