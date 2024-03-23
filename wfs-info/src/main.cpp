@@ -22,8 +22,6 @@ std::string inline prettify_path(const std::filesystem::path& path) {
   return "/" + path.generic_string();
 }
 
-constexpr int blocks_counts[] = {0, 3, 6, 10, 14, 18, 22, 26};
-
 void dumpArea(int depth, const std::filesystem::path& path, const std::shared_ptr<Area>& area) {
   std::string padding(depth, '\t');
   std::cout << std::format("{}Area {} [0x{:08x}-0x{:08x}]:\n", padding, prettify_path(path), area->BlockNumber(),
