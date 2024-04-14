@@ -25,7 +25,7 @@ std::string inline prettify_path(const std::filesystem::path& path) {
 void dumpArea(int depth, const std::filesystem::path& path, const std::shared_ptr<Area>& area) {
   std::string padding(depth, '\t');
   std::cout << std::format("{}Area {} [0x{:08x}-0x{:08x}]:\n", padding, prettify_path(path), area->BlockNumber(),
-                           area->AbsoluteBlockNumber(area->BlocksCount()));
+                           area->ToAbsoluteBlockNumber(area->BlocksCount()));
 
   padding += '\t';
   std::shared_ptr<FreeBlocksAllocator> allocator = throw_if_error(area->GetFreeBlocksAllocator());
@@ -34,14 +34,14 @@ void dumpArea(int depth, const std::filesystem::path& path, const std::shared_pt
 
   std::cout << std::format("{}Free blocks: 0x{:08x}\n", padding, allocator_header->free_blocks_count.value());
   std::cout << std::format("{}Free metadata blocks: 0x{:08x}\n", padding,
-                           allocator_header->free_metadata_blocks_count.value());
+                           area->ToAbsoluteBlocksCount(allocator_header->free_blocks_cache_count.value()));
   std::cout << std::format("{}Free metadata block: 0x{:08x}\n", padding,
-                           area->AbsoluteBlockNumber(allocator_header->free_metadata_block.value()));
+                           area->ToAbsoluteBlockNumber(allocator_header->free_blocks_cache_count.value()));
 
   if (depth == 0) {
     auto transactions_area = throw_if_error(area->GetTransactionsArea1());
     std::cout << std::format("{}Transactions area [0x{:08x}-0x{:08x}]\n", padding, transactions_area->BlockNumber(),
-                             transactions_area->AbsoluteBlockNumber(transactions_area->BlocksCount()));
+                             transactions_area->ToAbsoluteBlockNumber(transactions_area->BlocksCount()));
   }
 
   std::vector<FreeBlocksRangeInfo> ranges;
@@ -55,8 +55,8 @@ void dumpArea(int depth, const std::filesystem::path& path, const std::shared_pt
   std::cout << std::format("{}Free ranges:\n", padding);
   padding += '\t';
   for (const auto& range : ranges) {
-    std::cout << std::format("{}[0x{:08x}-0x{:08x}]\n", padding, area->AbsoluteBlockNumber(range.block_number),
-                             area->AbsoluteBlockNumber(range.block_number + range.blocks_count));
+    std::cout << std::format("{}[0x{:08x}-0x{:08x}]\n", padding, area->ToAbsoluteBlockNumber(range.block_number),
+                             area->ToAbsoluteBlockNumber(range.block_number + range.blocks_count));
   }
 }
 
