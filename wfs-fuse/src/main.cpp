@@ -190,7 +190,7 @@ int main(int argc, char* argv[]) {
     return 1;
   }
   if (fuse_opt_parse(&args, &param, wfs_opts, wfs_process_arg)) {
-    printf("failed to parse option\n");
+    printf(stderr, "failed to parse option\n");
     return 1;
   }
 
@@ -202,15 +202,15 @@ int main(int argc, char* argv[]) {
   is_mlc = param.type && !strcmp(param.type, "mlc");
   is_plain = param.type && !strcmp(param.type, "plain");
   if (!is_usb && !is_mlc && !is_plain) {
-    printf("Unsupported type (--type=usb/mlc/plain)\n");
+    fprintf(stderr, "Unsupported type (--type=usb/mlc/plain)\n");
     return 1;
   }
   if ((is_mlc || is_usb) && !param.otp) {
-    printf("Missing otp file (--otp)\n");
+    fprintf(stderr, "Missing otp file (--otp)\n");
     return 1;
   }
   if (is_usb && !param.seeprom) {
-    printf("Missing seeprom file (--seeprom)\n");
+    fprintf(stderr, "Missing seeprom file (--seeprom)\n");
     return 1;
   }
   if (param.otp)
@@ -224,14 +224,14 @@ int main(int argc, char* argv[]) {
     auto detection_result = Recovery::DetectDeviceParams(device, key);
     if (detection_result.has_value()) {
       if (*detection_result == WfsError::kInvalidWfsVersion)
-        std::cerr << "Error: Incorrect WFS version, possible wrong keys";
+        fprintf(stderr, "Error: Incorrect WFS version, possible wrong keys\n");
       else
         throw WfsException(*detection_result);
       return 1;
     }
     wfs_device = throw_if_error(WfsDevice::Open(device, key));
   } catch (std::exception& e) {
-    std::cerr << "Error: " << e.what() << std::endl;
+    fprintf(stderr, "Error: %s\n", e.what());
     return 1;
   }
 
