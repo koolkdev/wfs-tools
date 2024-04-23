@@ -11,7 +11,7 @@
 #include <mutex>
 #include <string>
 
-static std::shared_ptr<Wfs> wfs;
+static std::shared_ptr<WfsDevice> wfs_device;
 
 struct locked_stream {
   std::unique_ptr<File::stream> stream;
@@ -21,7 +21,7 @@ struct locked_stream {
 static int wfs_getattr(const char* path, struct stat* stbuf) {
   memset(stbuf, 0, sizeof(struct stat));
 
-  auto item = wfs->GetObject(path);
+  auto item = wfs_device->GetObject(path);
   if (!item)
     return -ENOENT;
   if (item->IsDirectory()) {
@@ -47,7 +47,7 @@ static int wfs_readdir(const char* path, void* buf, fuse_fill_dir_t filler, off_
   (void)offset;
   (void)fi;
 
-  auto item = wfs->GetObject(path);
+  auto item = wfs_device->GetObject(path);
   if (!item || !item->IsDirectory())
     return -ENOENT;
 
@@ -62,7 +62,7 @@ static int wfs_readdir(const char* path, void* buf, fuse_fill_dir_t filler, off_
 }
 
 static int wfs_open(const char* path, struct fuse_file_info* fi) {
-  auto item = wfs->GetObject(path);
+  auto item = wfs_device->GetObject(path);
   if (!item->IsFile())
     return -ENOENT;
 
@@ -96,7 +96,7 @@ static int wfs_read(const char* path, char* buf, size_t size, off_t offset, stru
 
 int wfs_readlink(const char* path, [[maybe_unused]] char* buf, [[maybe_unused]] size_t size) {
   // TODO
-  auto item = wfs->GetObject(path);
+  auto item = wfs_device->GetObject(path);
   if (!item || !item->IsLink())
     return -ENOENT;
 
@@ -229,7 +229,7 @@ int main(int argc, char* argv[]) {
         throw WfsException(*detection_result);
       return 1;
     }
-    wfs.reset(new Wfs(device, key));
+    wfs = WfsDevice::Open(device, key));
   } catch (std::exception& e) {
     std::cerr << "Error: " << e.what() << std::endl;
     return 1;

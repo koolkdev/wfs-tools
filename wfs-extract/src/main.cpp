@@ -192,7 +192,7 @@ int main(int argc, char* argv[]) {
         throw WfsException(*detection_result);
       return 1;
     }
-    auto dir = throw_if_error(WfsDevice::Open(std::make_shared<BlocksDevice>(device, key)))->GetDirectory(dump_path);
+    auto dir = throw_if_error(WfsDevice::Open(device, key))->GetDirectory(dump_path);
     if (!dir) {
       std::cerr << "Error: Didn't find directory " << dump_path << " in wfs" << std::endl;
       return 1;

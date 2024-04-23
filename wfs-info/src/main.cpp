@@ -151,7 +151,7 @@ int main(int argc, char* argv[]) {
         throw WfsException(*detection_result);
       return 1;
     }
-    auto wfs_device = throw_if_error(WfsDevice::Open(std::make_shared<BlocksDevice>(device, key)));
+    auto wfs_device = throw_if_error(WfsDevice::Open(device, key));
     std::cout << "Allocator state:" << std::endl;
     auto transactions_area = throw_if_error(wfs_device->GetTransactionsArea());
     std::cout << std::format("Transactions area [0x{:08x}-0x{:08x}]\n", transactions_area->device_block_number(),
