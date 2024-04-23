@@ -229,7 +229,7 @@ int main(int argc, char* argv[]) {
         throw WfsException(*detection_result);
       return 1;
     }
-    wfs_device = WfsDevice::Open(device, key));
+    wfs_device = throw_if_error(WfsDevice::Open(device, key)));
   } catch (std::exception& e) {
     std::cerr << "Error: " << e.what() << std::endl;
     return 1;
