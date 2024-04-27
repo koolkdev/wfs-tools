@@ -93,7 +93,7 @@ jobs:
           echo "CC=${{matrix.cc}}" >> $GITHUB_ENV
           echo "CXX=${{matrix.cxx}}" >> $GITHUB_ENV
         shell: bash
-        if: matrix.platform != 'windows-latest'
+        if: matrix.cc != ''
 
       - name: Build
         uses: lukka/run-cmake@v10
@@ -109,7 +109,7 @@ jobs:
           strip build/${{matrix.configure_preset}}/wfs-info/Release/wfs-info
           strip build/${{matrix.configure_preset}}/wfs-reencryptor/Release/wfs-reencryptor
         shell: bash
-        if: matrix.cc != ''
+        if: matrix.platform != 'windows-latest'
   
       - name: Upload wfs-extract
         uses: actions/upload-artifact@v4
