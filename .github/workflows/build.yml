@@ -79,6 +79,7 @@ jobs:
           brew install macfuse
           sed -i '' '/^#define _LIBCPP_HAS_NO_VENDOR_AVAILABILITY_ANNOTATIONS/d' /usr/local/opt/llvm/include/c++/v1/__config_site
           # echo "CXXFLAGS=-I/usr/local/opt/llvm/include" >> $GITHUB_ENV
+          echo "CXXFLAGS=-mmacos-version-min=10.10" >> $GITHUB_ENV
         shell: bash
         if: matrix.platform == 'macos-13'
 
@@ -89,6 +90,7 @@ jobs:
           brew install macfuse
           sed -i '' '/^#define _LIBCPP_HAS_NO_VENDOR_AVAILABILITY_ANNOTATIONS/d' /opt/homebrew/opt/llvm/include/c++/v1/__config_site
           #echo "CXXFLAGS=-I/opt/homebrew/opt/llvm/include" >> $GITHUB_ENV
+          echo "CXXFLAGS=-mmacos-version-min=10.10" >> $GITHUB_ENV
         shell: bash
         if: matrix.platform == 'macos-14'
 
