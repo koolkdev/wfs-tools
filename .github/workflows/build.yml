@@ -77,7 +77,8 @@ jobs:
           rm /usr/local/bin/python3-config || true
           brew install llvm
           brew install macfuse
-          echo "CXXFLAGS=-I/usr/local/opt/llvm/include" >> $GITHUB_ENV
+          sed -i '' '/^#define _LIBCPP_HAS_NO_VENDOR_AVAILABILITY_ANNOTATIONS/d' /usr/local/opt/llvm/include/c++/v1/__config_site
+          # echo "CXXFLAGS=-I/usr/local/opt/llvm/include" >> $GITHUB_ENV
         shell: bash
         if: matrix.platform == 'macos-13'
 
@@ -86,7 +87,8 @@ jobs:
           brew update
           brew install llvm
           brew install macfuse
-          echo "CXXFLAGS=-I/opt/homebrew/opt/llvm/include" >> $GITHUB_ENV
+          sed -i '' '/^#define _LIBCPP_HAS_NO_VENDOR_AVAILABILITY_ANNOTATIONS/d' /opt/homebrew/opt/llvm/include/c++/v1/__config_site
+          #echo "CXXFLAGS=-I/opt/homebrew/opt/llvm/include" >> $GITHUB_ENV
         shell: bash
         if: matrix.platform == 'macos-14'
 
