@@ -86,7 +86,7 @@ jobs:
           #echo "CXXFLAGS=-mmacos-version-min=13.3" >> $GITHUB_ENV
           echo "LDFLAGS=-L$(brew --prefix llvm)/lib/c++" >> $GITHUB_ENV
         shell: bash
-        if: (matrix.platform == 'macos-13' || matrix.platform == 'macos-14')
+        if: matrix.platform == 'macos-13' || matrix.platform == 'macos-14'
 
       - name: Set compiler
         run: |
@@ -127,6 +127,9 @@ jobs:
         with:
           name: wfs-reencryptor-${{matrix.release_name}}
           path: build/${{matrix.configure_preset}}/wfs-reencryptor/Release
+
+      - name: Quick test
+        run: build/${{matrix.configure_preset}}/wfs-info/Release/wfs-info --help
 
       - name: Prepare Release Windows
         run: powershell Compress-Archive -Path build\${{matrix.configure_preset}}\wfs-file-injector\Release\wfs-file-injector.exe, build\${{matrix.configure_preset}}\wfs-extract\Release\wfs-extract.exe, build\${{matrix.configure_preset}}\wfs-info\Release\wfs-info.exe, build\${{matrix.configure_preset}}\wfs-reencryptor\Release\wfs-reencryptor.exe -DestinationPath wfs-tools-${{github.ref_name}}-${{matrix.release_name}}.zip
