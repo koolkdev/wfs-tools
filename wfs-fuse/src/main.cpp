@@ -221,7 +221,7 @@ int main(int argc, char* argv[]) {
     seeprom_path = param.seeprom;
 
   try {
-    auto key = get_key(type : "usb", otp_path, seeprom_path);
+    auto key = get_key(type, otp_path, seeprom_path);
     auto device = std::make_shared<FileDevice>(param.file, 9);
     auto detection_result = Recovery::DetectDeviceParams(device, key);
     if (detection_result.has_value()) {
