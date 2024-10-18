@@ -81,7 +81,7 @@ jobs:
         run: |
           brew update
           brew install llvm
-          brew install macfuse=
+          brew install macfuse
           echo "CXXFLAGS=-mmacos-version-min=13.4" >> $GITHUB_ENV
         shell: bash
         if: matrix.platform == 'macos-13' || matrix.platform == 'macos-14'
