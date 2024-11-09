@@ -71,7 +71,7 @@ class ReencryptorBlocksDevice final : public BlocksDevice {
       output_device->WriteBlock(block_number, info.size_in_blocks, data, {}, info.iv, info.encrypted,
                                 /*recalculate_hash=*/false);
       bytes_so_far += info.data_size;
-      std::print("\rReencrypting: {: 6.2f}/{:.2f} GB [{:.2f}%]", static_cast<double>(bytes_so_far) / kBytesPerGB,
+      std::print("Reencrypting: {: 6.2f}/{:.2f} GB [{:.2f}%]\r", static_cast<double>(bytes_so_far) / kBytesPerGB,
                  static_cast<double>(total_bytes) / kBytesPerGB, static_cast<double>(bytes_so_far) / total_bytes * 100);
     }
   }
