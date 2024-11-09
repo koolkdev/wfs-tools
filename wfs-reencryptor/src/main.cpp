@@ -152,7 +152,7 @@ void exploreDir(const ReencryptorBlocksDevice* reencryptor,
 }
 
 void exploreTransactions(const ReencryptorBlocksDevice* reencryptor, const std::shared_ptr<WfsDevice>& wfs_device) {
-  updateExploreStatus(reencryptor, "Exploring: transactions\r");
+  updateExploreStatus(reencryptor, "transactions");
   try {
     throw_if_error(wfs_device->GetTransactionsArea(false));
   } catch (const WfsException& e) {
