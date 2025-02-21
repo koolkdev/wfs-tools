@@ -21,12 +21,13 @@ struct locked_stream {
 static int wfs_getattr(const char* path, struct stat* stbuf) {
   memset(stbuf, 0, sizeof(struct stat));
 
-  auto item = g_wfs_device->GetObject(path);
+  auto item = g_wfs_device->GetEntry(path);
   if (!item)
     return -ENOENT;
   if (item->is_directory()) {
     stbuf->st_mode = S_IFDIR | 0755;
-    stbuf->st_nlink = 2 + std::dynamic_pointer_cast<Directory>(item)->Size();
+    stbuf->st_nlink = 2 + std::dynamic_pointer_cast<Directory>(item)->size();
+
   } else if (item->is_link()) {
     stbuf->st_mode = S_IFLNK | 0777;
     stbuf->st_nlink = 1;
@@ -47,7 +48,7 @@ static int wfs_readdir(const char* path, void* buf, fuse_fill_dir_t filler, off_
   (void)offset;
   (void)fi;
 
-  auto item = g_wfs_device->GetObject(path);
+  auto item = g_wfs_device->GetEntry(path);
   if (!item || !item->is_directory())
     return -ENOENT;
 
@@ -62,7 +63,7 @@ static int wfs_readdir(const char* path, void* buf, fuse_fill_dir_t filler, off_
 }
 
 static int wfs_open(const char* path, struct fuse_file_info* fi) {
-  auto item = g_wfs_device->GetObject(path);
+  auto item = g_wfs_device->GetEntry(path);
   if (!item->is_file())
     return -ENOENT;
 
@@ -96,7 +97,7 @@ static int wfs_read(const char* path, char* buf, size_t size, off_t offset, stru
 
 int wfs_readlink(const char* path, [[maybe_unused]] char* buf, [[maybe_unused]] size_t size) {
   // TODO
-  auto item = g_wfs_device->GetObject(path);
+  auto item = g_wfs_device->GetEntry(path);
   if (!item || !item->is_link())
     return -ENOENT;
 
