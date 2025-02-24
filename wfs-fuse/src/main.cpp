@@ -27,7 +27,6 @@ static int wfs_getattr(const char* path, struct stat* stbuf) {
   if (item->is_directory()) {
     stbuf->st_mode = S_IFDIR | 0755;
     stbuf->st_nlink = 2 + std::dynamic_pointer_cast<Directory>(item)->size();
-
   } else if (item->is_link()) {
     stbuf->st_mode = S_IFLNK | 0777;
     stbuf->st_nlink = 1;
