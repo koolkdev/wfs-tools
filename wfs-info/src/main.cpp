@@ -58,12 +58,12 @@ void dirInfo(int depth, const std::shared_ptr<Directory>& dir, const std::filesy
     quotaInfo(depth, path, dir->quota());
     depth += 1;
   }
-  for (auto [name, item_or_error] : *dir) {
+  for (auto [name, entry_or_error] : *dir) {
     auto const npath = path / name;
     try {
-      auto item = throw_if_error(item_or_error);
-      if (item->is_directory())
-        dirInfo(depth, std::dynamic_pointer_cast<Directory>(item), npath);
+      auto entry = throw_if_error(entry_or_error);
+      if (entry->is_directory())
+        dirInfo(depth, std::dynamic_pointer_cast<Directory>(entry), npath);
     } catch (const WfsException& e) {
       std::println(std::cerr, "Error: Failed to dump {} ({})", prettify_path(npath), e.what());
     }
